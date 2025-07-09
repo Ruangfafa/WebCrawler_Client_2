@@ -13,3 +13,7 @@ DB_ssl_disabled=os.getenv("DB_ssl_disabled")=="True"
 
 # 读取Log配置项
 LOG_PRINT=os.getenv("LOG_PRINT")=="True"
+
+# 读取Chrome配置项
+HEADLESS=os.getenv("HEADLESS")=="True"
+USER_FILE=os.getenv("USER_FILE")
