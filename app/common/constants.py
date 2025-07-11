@@ -22,11 +22,27 @@ class LogMessageCons:
     CD_GETURL_SUCCESS = "✔️当前网址获取成功：%s"
     CD_GETURL_FAIL = "❌获取当前网址失败"
     CD_MOVE_FAIL = "❌未找到元素：%s"
+    CD_FIND_ELEMENT_SUCCESS = "✔️成功找到元素"
+    CD_FIND_ELEMENT_FAIL = "❌未找到元素：%s"
+    CD_FIND_ELEMENTS_SUCCESS = "✔️成功找到元素列表"
+    CD_FIND_ELEMENTS_FAIL = "❌未找到元素列表：%s"
+    CD_GET_ATTRIBUTE_SUCCESS = "✔️成功找到属性"
+    CD_GET_ATTRIBUTE_FAIL = "❌未找到属性"
 
-    AP_HIT_URL = "⚠️当前页面命中验证 URL：[%s]，进入等待..."
-    AP_HIT_XPATH = "⚠️页面包含验证 XPath：[%s]，进入等待..."
-    AP_FIND_SUCCESS = "✔️找到 %s 元素"
-    AP_FIND_FAIL = "❌未找到 %s 元素"
+    AP_SAFE_CONTINUE_SUCCESS = "✔️无异常拦截"
+    AP_SAFE_CONTINUE_WAIT = "⚠️异常拦截，等待手动恢复中..."
+
+    AP_PERSIST_FIND_ELEMENT_SUCCESS = "✔️成功找到元素：%s"
+    AP_PERSIST_FIND_ELEMENT_TRY = "⚠️暂未找到元素，重试中..."
+    AP_PERSIST_FIND_ELEMENT_FAIL = "❌未找到元素"
+    AP_PERSIST_FIND_ELEMENTS_SUCCESS = "✔️成功找到元素列表：%s"
+    AP_PERSIST_FIND_ELEMENTS_TRY = "⚠️暂未找到元素列表，重试中..."
+    AP_PERSIST_FIND_ELEMENTS_FAIL = "❌未找到元素列表"
+    AP_PERSIST_GET_ATTRIBUTE_SUCCESS = "✔️成功找到属性：%s"
+    AP_PERSIST_GET_ATTRIBUTE_TRY = "⚠️暂未找到属性，重试中..."
+    AP_PERSIST_GET_ATTRIBUTE_FAIL = "❌未找到属性"
+
+
 class LogSourceCons:
      DATABASE_SERVICE = "app/service/database_service.py"
      CHROME_DRIVER_SERVICE = "app/service/chrome_driver_service.py"
@@ -84,3 +100,11 @@ class SellerCrawlerPy:
     XPATH_LOCATION_TRIANGLE = "//i[contains(@class,'icon-triangle')]"
     XPATH_LOCATION = "//li[contains(@class,'locus')]//div[contains(@class,'right')]"
     XPATH_SCORE_ELEMENTS = "//span[contains(@class, 'shopdsr-score-con')]"
+
+    BLANK_DATA = "?"
+    NO_DATA = "N/A"
+
+class SellerTagCrawlerPy:
+    XPATH_C_TAGS = "//div[contains(@class,'attrValues')]/ul[contains(@class, 'av-collapse') and contains(@class, 'd5c')]//li"
+    XPATH_ATTRIBUTE_HERF = "herf"
+

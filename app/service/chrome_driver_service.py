@@ -42,11 +42,32 @@ def get_url(driver):
         log(LogMessageCons.CD_GETURL_FAIL, LogSourceCons.CHROME_DRIVER_SERVICE, LOG_PRINT, e)
         return None
 
-def find_element(driver, by, xpath):
-    return driver.find_element(by, xpath)
+def find_element(driver, by, xpath, log_print=LOG_PRINT):
+    try:
+        element = driver.find_element(by, xpath)
+        log(LogMessageCons.CD_FIND_ELEMENT_SUCCESS, LogSourceCons.CHROME_DRIVER_SERVICE, log_print)
+        return element
+    except Exception as e:
+        log(LogMessageCons.CD_FIND_ELEMENT_FAIL % xpath, LogSourceCons.CHROME_DRIVER_SERVICE, log_print, e)
+        return None
 
-def find_elements(driver, by, value):
-    return driver.find_elements(by, value)
+def find_elements(driver, by, value, log_print=LOG_PRINT):
+    try:
+        elements = driver.find_elements(by, value)
+        log(LogMessageCons.CD_FIND_ELEMENTS_SUCCESS, LogSourceCons.CHROME_DRIVER_SERVICE, log_print)
+        return elements
+    except Exception as e:
+        log(LogMessageCons.CD_FIND_ELEMENTS_FAIL, LogSourceCons.CHROME_DRIVER_SERVICE, log_print, e)
+        return None
+
+def get_attribute(element, value, log_print=LOG_PRINT):
+    try:
+        attribute = element.get_attribute(value)
+        log(LogMessageCons.CD_GET_ATTRIBUTE_SUCCESS, LogSourceCons.CHROME_DRIVER_SERVICE, log_print)
+        return attribute
+    except Exception as e:
+        log(LogMessageCons.CD_GET_ATTRIBUTE_FAIL, LogSourceCons.CHROME_DRIVER_SERVICE, log_print, e)
+        return None
 
 def if_ready_state(driver):
     try:
