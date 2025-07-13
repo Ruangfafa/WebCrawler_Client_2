@@ -27,7 +27,7 @@ PAGE_LOAD_TIMEOUT=int(os.getenv("PAGE_LOAD_TIMEOUT"))
 # 读取异常处理验证拦截配置（以逗号分隔）
 def parse_list(env_key):
     raw = os.getenv(env_key, "")
-    return [item.strip() for item in raw.split(',') if item.strip()]
+    return [item.strip() for item in raw.split('_,_') if item.strip()]
 
 URLS = parse_list("URLS")
 XPATHS = parse_list("XPATHS")

@@ -95,6 +95,20 @@ class ChromeDriverServicePy:
         user_dir = os.path.join(ChromeDriverServicePy.CHROME_DIR, USER_FILE)
         return f"--user-data-dir={user_dir}"
 
+class TaskSellerIdentifierPy:
+    URL_TMALL = ".tmall.com"
+    SELLER_ID = r'https?://(?:[^/]+\.)?([^.]+)\.tmall\.com'
+    DOT = "."
+
+class TaskTagIdentifierPy:
+    URL_TMALL = ".tmall.com"
+    SELLER_ID = r'https?://(?:[^/]+\.)?([^.]+)\.tmall\.com'
+    DOT = "."
+    CATEGORY_C_PREFIX = "c_:_%s"
+    CATEGORY_P_PREFIX = "p_:_%s"
+    CATEGORY_ALL_PREFIX = "a_:_xxxxx"
+    REGEX_CATEGORY_C = r'category-(\d+)'
+    REGEX_CATEGORY_P = r'pv=([^&]+)'
 
 class SellerCrawlerPy:
     XPATH_NAME = "//a[contains(@class, 'slogo-shopname')]/strong"
@@ -125,3 +139,18 @@ class SellerTagCrawlerPy:
     CATEGORY_P_PREFIX = "p_:_%s"
     CATEGORY_P_PREFIX_TAG = "%s_:_%s"
     ATTRIBUTE_HREF = "href"
+
+class ProductTagCrawlerPy:
+    BLANK_DATA = "?"
+    CLASS_PAGINATION = "pagination"
+    ATTRIBUTE_CLASS = "class"
+    ATTRIBUTE_DATA_ID = "data-id"
+    ATTRIBUTE_HREF = "href"
+
+    XPATH_ALL_PRODUCT_DIVS = "//div[contains(@class, 'J_TItems')]/div"
+    XPATH_PRODUCT = "./dl"
+    XPATH_SOLD = ".//span[contains(@class,'sale-num')]"
+    XPATH_PAGE_INFO = "//b[contains(@class, 'ui-page-s-len')]"
+    XPATH_PAGE_NEXT = "//a[contains(@title, '下一页') and contains(@class, 'ui-page-s-next')]"
+
+
