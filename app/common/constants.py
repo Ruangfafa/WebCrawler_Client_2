@@ -108,7 +108,11 @@ class TaskTagIdentifierPy:
     CATEGORY_P_PREFIX = "p_:_%s"
     CATEGORY_ALL_PREFIX = "a_:_xxxxx"
     REGEX_CATEGORY_C = r'category-(\d+)'
-    REGEX_CATEGORY_P = r'pv=([^&]+)'
+    REGEX_CATEGORY_P = r'[?&]pv=([^&#]+)'
+
+class TaskProductIdentifierPy:
+    URL_TMALL = ".tmall.com"
+    PRODUCT_ID = r"[?&]id=(\d+)"
 
 class SellerCrawlerPy:
     XPATH_NAME = "//a[contains(@class, 'slogo-shopname')]/strong"
@@ -152,5 +156,38 @@ class ProductTagCrawlerPy:
     XPATH_SOLD = ".//span[contains(@class,'sale-num')]"
     XPATH_PAGE_INFO = "//b[contains(@class, 'ui-page-s-len')]"
     XPATH_PAGE_NEXT = "//a[contains(@title, '下一页') and contains(@class, 'ui-page-s-next')]"
+
+class ProductCrawlerPy:
+    BLANK_DATA = "?"
+    ATTRIBUTE_TITLE = "title"
+    ATTRIBUTE_CLASS = "class"
+    INFO_CONNECTOR = "_&_"
+    NO_DISCOUNT = "<No Discount>"
+    IS_DISABLED = 'isDisabled'
+    IS_SELECTED = 'isSelected'
+    ONLY_PATTERN = '<Only Pattern>'
+    SKU_ID = r'[?&]skuId=(\d+)'
+    DOT = '·'
+    BLANK = ''
+    TO = '至'
+
+
+    XPATH_TITLE = "//h1[contains(@class,'--mainTitle--')]"
+    XPATH_SOLD365 = "//div[contains(@class, '--salesDesc--')]"
+    XPATH_ADDRESS = "//div[contains(@class, '--delivery-from-addr--')]"
+    XPATH_GUARANTEES = "//div[contains(@class, '--triggerWrap--')]/span[contains(@class,'--guaranteeText--')]"
+    XPATH_PARAMETERS = "//div[contains(@class, '--tableWrapper--')]/div[contains(@class,'--infoItem--')]"
+    XPATH_PATTERN_COMS = "//div[contains(@class, '--tagList--')]/span[contains(@class, '--tagItem--')]"
+    XPATH_SKU_ITEMS = "//div[contains(@class, '--SkuContent--')]/div[contains(@class, '--skuItem--')]"
+    XPATH_VALUE_ITEMS = ".//div[contains(@class, '--valueItem--')]"
+    XPATH_PRICE_WRAP = "//div[contains(@class, '--priceWrap--')]"
+    XPATH_SUB_PRICE = "(./div[contains(@class, '--subPrice--')]/span[contains(@class,'--text--')])[2]"
+    XPATH_HIGHLIGHT_PRICE = "./div[contains(@class, '--highlightPrice--')]/span[contains(@class,'--text--')]"
+
+
+
+
+
+
 
 

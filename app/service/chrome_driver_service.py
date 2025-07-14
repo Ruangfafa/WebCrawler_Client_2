@@ -95,5 +95,5 @@ def move_by_offset(driver, offset_x, offset_y, click=False):
     actions.perform()
 
 def get_text(driver, source_element):
-    return driver.execute_script(ChromeDriverServicePy.JS_GET_TEXT, source_element)
+    return driver.execute_script(ChromeDriverServicePy.JS_GET_TEXT, source_element).strip()
 
