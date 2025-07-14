@@ -25,12 +25,6 @@ def wait_load(driver, safe=True):
     return False
 
 def safe_continue(driver, log_print=LOG_PRINT):
-    """
-    在进入操作流程前进行验证码拦截检查。
-    若命中指定 URL 或 XPath 特征，则进入等待循环。
-    否则立即返回继续执行。
-    """
-    # 检查 URL
     abnormal = False
     while (
             any(bypass_url in get_url(driver) for bypass_url in URLS) or
@@ -42,16 +36,18 @@ def safe_continue(driver, log_print=LOG_PRINT):
     log(LogMessageCons.AP_SAFE_CONTINUE_SUCCESS, LogSourceCons.ABNORMAL_PROCESSING_SERVICE, log_print)
     if abnormal: wait_load(driver, False)
 
-def safe_find_element(driver, by, value, log_print=LOG_PRINT):
+def safe_find_element(driver, by, value, log_print=LOG_PRINT, source_element=None):
     safe_continue(driver)
-    return find_element(driver, by, value, log_print)
+    if not source_element: source_element = driver
+    return find_element(source_element, by, value, log_print)
 
-def persist_find_element(driver, by, value, duration=0.5, retry=10, safe=True):
+def persist_find_element(driver, by, value, duration=0.5, retry=10, safe=True, source_element=None):
+    if not source_element: source_element = driver
     for attempt in range(retry):
         if safe:
-            element = safe_find_element(driver, by, value, False)
+            element = safe_find_element(driver, by, value, False, source_element)
         else:
-            element = find_element(driver, by, value, False)
+            element = find_element(source_element, by, value, False)
         if element:
             log(LogMessageCons.AP_PERSIST_FIND_ELEMENT_SUCCESS % element, LogSourceCons.ABNORMAL_PROCESSING_SERVICE, LOG_PRINT)
             return element
@@ -60,16 +56,18 @@ def persist_find_element(driver, by, value, duration=0.5, retry=10, safe=True):
     log(LogMessageCons.AP_PERSIST_FIND_ELEMENT_FAIL, LogSourceCons.ABNORMAL_PROCESSING_SERVICE, LOG_PRINT)
     return None  # 最终未找到
 
-def safe_find_elements(driver, by, value, log_print=LOG_PRINT):
+def safe_find_elements(driver, by, value, log_print=LOG_PRINT, source_element=None):
     safe_continue(driver)
-    return find_elements(driver, by, value, log_print)
+    if not source_element: source_element = driver
+    return find_elements(source_element, by, value, log_print)
 
-def persist_find_elements(driver, by, value, duration=0.5, retry=10, safe=True):
+def persist_find_elements(driver, by, value, duration=0.5, retry=10, safe=True, source_element=None):
+    if not source_element: source_element = driver
     for attempt in range(retry):
         if safe:
-            elements = safe_find_elements(driver, by, value, False)
+            elements = safe_find_elements(driver, by, value, False, source_element)
         else:
-            elements = find_elements(driver, by, value, False)
+            elements = find_elements(source_element, by, value, False)
         if elements:
             log(LogMessageCons.AP_PERSIST_FIND_ELEMENTS_SUCCESS % elements, LogSourceCons.ABNORMAL_PROCESSING_SERVICE, LOG_PRINT)
             return elements
@@ -78,16 +76,16 @@ def persist_find_elements(driver, by, value, duration=0.5, retry=10, safe=True):
     log(LogMessageCons.AP_PERSIST_FIND_ELEMENTS_FAIL, LogSourceCons.ABNORMAL_PROCESSING_SERVICE, LOG_PRINT)
     return []  # 最终未找到
 
-def safe_get_attribute(driver, element, value, log_print=LOG_PRINT):
+def safe_get_attribute(driver, source_element, value, log_print=LOG_PRINT):
     safe_continue(driver)
-    return get_attribute(element, value, log_print)
+    return get_attribute(source_element, value, log_print)
 
-def persist_get_attribute(driver, element, value, duration=0.5, retry=10, safe=True):
+def persist_get_attribute(driver, source_element, value, duration=0.5, retry=10, safe=True):
     for attempt in range(retry):
         if safe:
-            attribute = safe_get_attribute(driver, element, value, False)
+            attribute = safe_get_attribute(driver, source_element, value, False)
         else:
-            attribute = get_attribute(element, value, False)
+            attribute = get_attribute(source_element, value, False)
         if attribute:
             log(LogMessageCons.AP_PERSIST_GET_ATTRIBUTE_SUCCESS % attribute, LogSourceCons.ABNORMAL_PROCESSING_SERVICE, LOG_PRINT)
             return attribute

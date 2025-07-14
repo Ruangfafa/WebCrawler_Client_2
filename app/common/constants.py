@@ -76,6 +76,7 @@ class ChromeDriverServicePy:
 
     JS_READYSTATE_GET = "return document.readyState"
     JS_READYSTATE = "complete"
+    JS_GET_TEXT = "return arguments[0].textContent.trim();"
 
     # 浏览器参数配置
     WINDOW_SIZE = "--window-size=1920,1080"
@@ -105,6 +106,22 @@ class SellerCrawlerPy:
     NO_DATA = "N/A"
 
 class SellerTagCrawlerPy:
-    XPATH_C_TAGS = "//div[contains(@class,'attrValues')]/ul[contains(@class, 'av-collapse') and contains(@class, 'd5c')]//li"
-    XPATH_ATTRIBUTE_HERF = "herf"
+    XPATH_C_PROPS = "//div[contains(@class, 'tshop-pbsm-shop-nav-ch')]//ul[contains(@class, 'J_TAllCatsTree') and contains(@class, 'cats-tree')]/li[position() > 1]"
+    XPATH_C_TAG = "./h4/a"
+    XPATH_CC_PROPS = "./div//li"
+    XPATH_CC_TAG = "./h4/a"
+    XPATH_P_PROPS = "//div[contains(@class, 'propAttrs')]//div[contains(@class, 'attr') and contains(@class, 'J_TProp')]"
+    XPATH_P_PROP_KEY = ".//div[contains(@class, 'attrKey')]"
+    XPATH_P_TAGS = ".//div[contains(@class, 'attrValues')]//ul[contains(@class, 'av-collapse')]//li//a"
 
+    BLANK_DATA = "?"
+    NO_DATA = "N/A"
+    ALL_PRODUCT = "所有分类"
+    CATEGORY_ALL_PREFIX = "a_:_xxxxx"
+    REGEX_CATEGORY_C = r'category-(\d+)'
+    CATEGORY_C_PREFIX = "c_:_%s"
+    CATEGORY_CC_PREFIX_TAG = "%s_:_%s"
+    REGEX_CATEGORY_P = r"pv=([^&]+)"
+    CATEGORY_P_PREFIX = "p_:_%s"
+    CATEGORY_P_PREFIX_TAG = "%s_:_%s"
+    ATTRIBUTE_HREF = "href"
