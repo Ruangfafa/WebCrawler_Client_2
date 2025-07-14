@@ -1,8 +1,10 @@
 import mysql.connector
-from app.common.config_loader import LOG_PRINT
+
 from mysql.connector import Error, MySQLConnection
-from app.service.log import log
+
+from app.common.config_loader import LOG_PRINT
 from app.common.constants import LogMessageCons, LogSourceCons, DatabaseServicePy
+from app.service.log import log
 
 def get_connection(host, port, user, password, ssl_disabled):
     try:
@@ -20,7 +22,7 @@ def get_connection(host, port, user, password, ssl_disabled):
         log(LogMessageCons.DB_LOGIN_FAIL, source=LogSourceCons.DATABASE_SERVICE, doPrint=LOG_PRINT, error=e)
         return None
 
-def get_status(conn: MySQLConnection, database: str, key: str):
+def get_state(conn, database, key):
     try:
         conn.commit()
         cursor = conn.cursor()
@@ -32,12 +34,91 @@ def get_status(conn: MySQLConnection, database: str, key: str):
         row = cursor.fetchone()
         if row:
             value = int(row[0])
-            log(message=LogMessageCons.DB_CLIENT_GETSTATE_SUCCESS % (database, key, value), source=LogSourceCons.DATABASE_SERVICE, doPrint=LOG_PRINT)
+            log(LogMessageCons.DB_CLIENT_GETSTATE_SUCCESS % (database, key, value), LogSourceCons.DATABASE_SERVICE, LOG_PRINT)
             return value
         else:
-            log(message=LogMessageCons.DB_CLIENT_GETSTATE_NOTFOUND % (database, key), source=LogSourceCons.DATABASE_SERVICE, doPrint=LOG_PRINT)
+            log(LogMessageCons.DB_CLIENT_GETSTATE_NOTFOUND % (database, key), LogSourceCons.DATABASE_SERVICE, LOG_PRINT)
             return None
 
     except Error as e:
-        log(message=LogMessageCons.DB_CLIENT_GETSTATE_FAIL % (database, key), error=e, source=LogSourceCons.DATABASE_SERVICE, doPrint=LOG_PRINT)
+        log(LogMessageCons.DB_CLIENT_GETSTATE_FAIL % (database, key), LogSourceCons.DATABASE_SERVICE, LOG_PRINT, e)
         return None
+
+def set_state(conn: MySQLConnection, database, key, value):
+    try:
+        cursor = conn.cursor()
+
+        # 尝试更新
+        update_sql = DatabaseServicePy.SQL_CLIENTSTATUS_UPDATE % database
+        cursor.execute(update_sql, (value, key))
+
+        conn.commit()
+
+        log(LogMessageCons.DB_CLIENT_SETSTATE_SUCCESS % (database, key, value), LogSourceCons.DATABASE_SERVICE, LOG_PRINT)
+
+        return True
+
+    except Error as e:
+        log(LogMessageCons.DB_CLIENT_SETSTATE_FAIL % (database, key, value), LogSourceCons.DATABASE_SERVICE, LOG_PRINT, e)
+        return False
+
+def get_a_url(conn, database):
+    try:
+        cursor = conn.cursor()
+        sql = DatabaseServicePy.SQL_TASK_SELECT_FIRST % database
+        cursor.execute(sql)
+        row = cursor.fetchone()
+        if row: return row  # 返回 (id, url)
+        else: return None
+    except Error as e:
+        log(LogMessageCons.DB_GET_URL_FAIL % database, LogSourceCons.DATABASE_SERVICE, LOG_PRINT, e)
+        return None
+
+def remove_url(conn, database, task_id):
+    try:
+        cursor = conn.cursor()
+        delete_sql = DatabaseServicePy.SQL_TASK_DELETE_BY_ID % database
+        cursor.execute(delete_sql, (task_id,))
+        conn.commit()
+        log(LogMessageCons.DB_REMOVE_URL_SUCCESS % (database, task_id), LogSourceCons.DATABASE_SERVICE, LOG_PRINT)
+        return True
+    except Error as e:
+        log(LogMessageCons.DB_REMOVE_URL_FAIL % (database, task_id), LogSourceCons.DATABASE_SERVICE, LOG_PRINT, e)
+        return False
+
+def to_camel_case(snake_str):
+    """
+    将变量名从 snake_case 转换为 camelCase
+    例：craw_date → crawDate
+    """
+    components = snake_str.split(DatabaseServicePy.FORMAT_UNDERLINE)
+    return components[0] + DatabaseServicePy.FORMAT_BLANK.join(x.capitalize() for x in components[1:]) if len(components) > 1 else snake_str
+
+
+def insert_data(conn, data):
+    cursor = conn.cursor()
+    table = data.__class__.__name__
+
+    if not isinstance(data, dict):
+        data = data.__dict__
+
+    # 转换字段名为 camelCase
+    transformed_data = {to_camel_case(k): v for k, v in data.items()}
+
+    columns = DatabaseServicePy.SQL_COLUMNS_JOIN(transformed_data.keys())
+    placeholders = DatabaseServicePy.SQL_PLACEHOLDER_JOIN(len(transformed_data))
+    values = list(transformed_data.values())
+
+    sql = DatabaseServicePy.SQL_DATA_INSERT % (table, columns, placeholders)
+
+    try:
+        cursor.execute(sql, values)
+        conn.commit()
+        log(LogMessageCons.DB_SERVER_INSERT_SUCCESS % table, LogSourceCons.DATABASE_SERVICE, LOG_PRINT)
+        return True
+    except Exception as e:
+        conn.rollback()
+        log(LogMessageCons.DB_SERVER_INSERT_FAIL % table, LogSourceCons.DATABASE_SERVICE, LOG_PRINT, e)
+        return False
+    finally:
+        cursor.close()
