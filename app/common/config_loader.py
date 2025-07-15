@@ -31,3 +31,6 @@ def parse_list(env_key):
 
 URLS = parse_list("URLS")
 XPATHS = parse_list("XPATHS")
+
+# CommentCrawler
+IN_DATE=int(os.getenv("IN_DATE"))

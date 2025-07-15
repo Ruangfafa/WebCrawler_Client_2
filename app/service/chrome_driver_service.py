@@ -97,3 +97,16 @@ def move_by_offset(driver, offset_x, offset_y, click=False):
 def get_text(driver, source_element):
     return driver.execute_script(ChromeDriverServicePy.JS_GET_TEXT, source_element).strip()
 
+def scroll_bottom(driver, source_element):
+    try:
+        driver.execute_script(ChromeDriverServicePy.JS_SCROLL_BOTTOM, source_element)
+        log(LogMessageCons.CD_SCROLL_BOTTOM_SUCCESS, LogSourceCons.CHROME_DRIVER_SERVICE, LOG_PRINT)
+    except Exception as e:
+        log(LogMessageCons.CD_SCROLL_BOTTOM_FAIL, LogSourceCons.CHROME_DRIVER_SERVICE, LOG_PRINT, e)
+
+def scroll_top(driver, source_element):
+    try:
+        driver.execute_script(ChromeDriverServicePy.JS_SCROLL_TOP, source_element)
+        log(LogMessageCons.CD_SCROLL_TOP_SUCCESS, LogSourceCons.CHROME_DRIVER_SERVICE, LOG_PRINT)
+    except Exception as e:
+        log(LogMessageCons.CD_SCROLL_TOP_FAIL, LogSourceCons.CHROME_DRIVER_SERVICE, LOG_PRINT, e)

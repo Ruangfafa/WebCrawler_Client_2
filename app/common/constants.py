@@ -28,12 +28,16 @@ class LogMessageCons:
     CD_FIND_ELEMENTS_FAIL = "❌未找到元素列表：%s"
     CD_GET_ATTRIBUTE_SUCCESS = "✔️成功找到属性"
     CD_GET_ATTRIBUTE_FAIL = "❌未找到属性"
+    CD_SCROLL_BOTTOM_SUCCESS = "✔️页面已滑动到底部"
+    CD_SCROLL_BOTTOM_FAIL = "❌页面滑动到底部失败"
+    CD_SCROLL_TOP_SUCCESS = "✔️页面已滑动到顶部"
+    CD_SCROLL_TOP_FAIL = "❌页面滑动到顶部失败"
 
     AP_SAFE_CONTINUE_SUCCESS = "✔️无异常拦截"
     AP_SAFE_CONTINUE_WAIT = "⚠️异常拦截，等待手动恢复中..."
 
     AP_PERSIST_FIND_ELEMENT_SUCCESS = "✔️成功找到元素：%s"
-    AP_PERSIST_FIND_ELEMENT_TRY = "⚠️暂未找到元素，重试中..."
+    AP_PERSIST_FIND_ELEMENT_TRY = "⚠️暂未找到元素，重试中(%s/%s)..."
     AP_PERSIST_FIND_ELEMENT_FAIL = "❌未找到元素"
     AP_PERSIST_FIND_ELEMENTS_SUCCESS = "✔️成功找到元素列表：%s"
     AP_PERSIST_FIND_ELEMENTS_TRY = "⚠️暂未找到元素列表，重试中..."
@@ -42,11 +46,15 @@ class LogMessageCons:
     AP_PERSIST_GET_ATTRIBUTE_TRY = "⚠️暂未找到属性，重试中..."
     AP_PERSIST_GET_ATTRIBUTE_FAIL = "❌未找到属性"
 
+    COMCRW_COMMENT_WAIT = "⚠️新评论加载中..."
+    COMCRW_COMMENT_END = "⚠️无法获取更多评论"
+
 
 class LogSourceCons:
-     DATABASE_SERVICE = "app/service/database_service.py"
-     CHROME_DRIVER_SERVICE = "app/service/chrome_driver_service.py"
-     ABNORMAL_PROCESSING_SERVICE = "app/service/abnormal_processing_service.py"
+    DATABASE_SERVICE = "app/service/database_service.py"
+    CHROME_DRIVER_SERVICE = "app/service/chrome_driver_service.py"
+    ABNORMAL_PROCESSING_SERVICE = "app/service/abnormal_processing_service.py"
+    COMMENT_CRAWLER = "app/service/crawlers/comment_crawler.py"
 
 class LogPy:
     TIME_STAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -77,6 +85,8 @@ class ChromeDriverServicePy:
     JS_READYSTATE_GET = "return document.readyState"
     JS_READYSTATE = "complete"
     JS_GET_TEXT = "return arguments[0].textContent.trim();"
+    JS_SCROLL_BOTTOM = "arguments[0].scrollTop = arguments[0].scrollHeight;"
+    JS_SCROLL_TOP = "arguments[0].scrollTop = 0;"
 
     # 浏览器参数配置
     WINDOW_SIZE = "--window-size=1920,1080"
@@ -171,7 +181,6 @@ class ProductCrawlerPy:
     BLANK = ''
     TO = '至'
 
-
     XPATH_TITLE = "//h1[contains(@class,'--mainTitle--')]"
     XPATH_SOLD365 = "//div[contains(@class, '--salesDesc--')]"
     XPATH_ADDRESS = "//div[contains(@class, '--delivery-from-addr--')]"
@@ -183,6 +192,40 @@ class ProductCrawlerPy:
     XPATH_PRICE_WRAP = "//div[contains(@class, '--priceWrap--')]"
     XPATH_SUB_PRICE = "(./div[contains(@class, '--subPrice--')]/span[contains(@class,'--text--')])[2]"
     XPATH_HIGHLIGHT_PRICE = "./div[contains(@class, '--highlightPrice--')]/span[contains(@class,'--text--')]"
+
+class CommentCrawlerPy:
+    BLANK_DATA = "?"
+    COMMENT_SPLIT = "\u00a0·\u00a0"
+    DATE_FORMAT = "%Y年%m月%d日"
+
+    XPATH_COMMENT = "//div[contains(@class, '--leftDrawer--')]//div[contains(@class, '--Comment--')]"
+    XPATH_LOADING = "//img[contains(@class, '--loading--')]"
+    XPATH_META = ".//div[contains(@class, '--meta--')]"
+    XPATH_COMMENTS = "//div[contains(@class, '--leftDrawer--')]//div[contains(@class, '--comments--')]"
+    XPATH_COMMENT_STR = ".//div[contains(@class, '--content--')]"
+    XPATH_SHOW_BUTTON = "//div[contains(@class, '--ShowButton--')]"
+    XPATH_SORT_DIV = "//div[contains(@class, '--leftDrawer--')]//div[contains(@class, '--sortBy--')]"
+    XPATH_SORT_BYDATE = "//div[contains(@class, '--leftDrawer--')]//div[contains(@class, '--sortBy--')]//div[text()='时间排序']"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

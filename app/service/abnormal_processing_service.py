@@ -52,7 +52,7 @@ def persist_find_element(driver, by, value, duration=0.5, retry=10, safe=True, s
             log(LogMessageCons.AP_PERSIST_FIND_ELEMENT_SUCCESS % element, LogSourceCons.ABNORMAL_PROCESSING_SERVICE, LOG_PRINT)
             return element
         time.sleep(duration)
-        log(LogMessageCons.AP_PERSIST_FIND_ELEMENT_TRY, LogSourceCons.ABNORMAL_PROCESSING_SERVICE, LOG_PRINT)
+        log(LogMessageCons.AP_PERSIST_FIND_ELEMENT_TRY % (attempt, retry), LogSourceCons.ABNORMAL_PROCESSING_SERVICE, LOG_PRINT)
     log(LogMessageCons.AP_PERSIST_FIND_ELEMENT_FAIL, LogSourceCons.ABNORMAL_PROCESSING_SERVICE, LOG_PRINT)
     return None  # 最终未找到
 
