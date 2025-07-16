@@ -122,3 +122,35 @@ def insert_data(conn, data):
         return False
     finally:
         cursor.close()
+
+def insert_data_batch(conn, data_list):
+    if not data_list:
+        return True
+
+    cursor = conn.cursor()
+    table = data_list[0].__class__.__name__
+
+    sample = data_list[0].__dict__
+    keys = [to_camel_case(k) for k in sample.keys()]
+    columns = DatabaseServicePy.SQL_COLUMNS_JOIN(keys)
+    placeholders = DatabaseServicePy.SQL_PLACEHOLDER_JOIN(len(keys))
+
+    sql = DatabaseServicePy.SQL_DATA_INSERT % (table, columns, placeholders)
+
+    values_list = []
+    for obj in data_list:
+        data = obj.__dict__
+        transformed_data = {to_camel_case(k): v for k, v in data.items()}
+        values_list.append(list(transformed_data.values()))
+
+    try:
+        cursor.executemany(sql, values_list)
+        conn.commit()
+        log(LogMessageCons.DB_SERVER_INSERT_SUCCESS % table, LogSourceCons.DATABASE_SERVICE, LOG_PRINT)
+        return True
+    except Exception as e:
+        conn.rollback()
+        log(LogMessageCons.DB_SERVER_INSERT_FAIL % table, LogSourceCons.DATABASE_SERVICE, LOG_PRINT, e)
+        return False
+    finally:
+        cursor.close()

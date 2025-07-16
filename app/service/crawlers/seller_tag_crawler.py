@@ -9,7 +9,7 @@ from app.common.enums import TaskSellerPageType
 from app.model.seller_tag import SellerTag
 from app.service.abnormal_processing_service import wait_load, persist_find_elements, persist_find_element, persist_get_attribute, safe_continue, safe_find_elements
 from app.service.chrome_driver_service import get_url, get_text
-from app.service.database_service import insert_data
+from app.service.database_service import insert_data, insert_data_batch
 from app.service.identifiers.task_seller_identifier import get_type, get_seller_id
 
 def craw(conn, driver, taskUrl):
@@ -30,35 +30,54 @@ def craw_tm(conn, driver):
     seller_id = get_seller_id(get_url(driver), TaskSellerPageType.TM)
 
     insert_data(conn, SellerTag(craw_date, page_type, seller_id, SellerTagCrawlerPy.ALL_PRODUCT, SellerTagCrawlerPy.CATEGORY_ALL_PREFIX))
-    c_tags = persist_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_C_PROPS)
-    for c_tag in c_tags:
-        c_tag_element = persist_find_element(driver, By.XPATH, SellerTagCrawlerPy.XPATH_C_TAG, source_element=c_tag)
-        tag = get_text(driver, c_tag_element)
-        href = persist_get_attribute(driver, c_tag_element, SellerTagCrawlerPy.ATTRIBUTE_HREF)
-        match = re.search(SellerTagCrawlerPy.REGEX_CATEGORY_C, href)
-        if match:
-            cp_id = SellerTagCrawlerPy.CATEGORY_C_PREFIX % match.group(1)
-        success = success and insert_data(conn, SellerTag(craw_date, page_type, seller_id, tag, cp_id))
-        if cc_tags := safe_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_CC_PROPS, source_element=c_tag):
-            for cc_tag in cc_tags:
-                cc_tag_element = persist_find_element(driver, By.XPATH, SellerTagCrawlerPy.XPATH_CC_TAG, source_element=cc_tag)
-                tag_child = get_text(driver, cc_tag_element)
-                href = persist_get_attribute(driver, cc_tag_element, SellerTagCrawlerPy.ATTRIBUTE_HREF)
-                match = re.search(SellerTagCrawlerPy.REGEX_CATEGORY_C, href)
-                if match:
-                    cp_id = SellerTagCrawlerPy.CATEGORY_C_PREFIX % match.group(1)
-                success = success and insert_data(conn, SellerTag(craw_date, page_type, seller_id, SellerTagCrawlerPy.CATEGORY_CC_PREFIX_TAG % (tag, tag_child), cp_id))
 
-    props = persist_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_P_PROPS)
-    for prop in props:
-        prop_element = persist_find_element(driver, By.XPATH, SellerTagCrawlerPy.XPATH_P_PROP_KEY, source_element=prop)
-        prop_name = get_text(driver, prop_element)
-        p_tags = persist_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_P_TAGS, source_element=prop)
-        for p_tag in p_tags:
-            href = persist_get_attribute(driver, p_tag, SellerTagCrawlerPy.ATTRIBUTE_HREF)
-            match = re.search(SellerTagCrawlerPy.REGEX_CATEGORY_P, href)
+    # 嵌套方法 1：提取 C 标签和 CC 标签
+    def extract_c_and_cc_tags():
+        insert_list = []
+        c_tags = persist_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_C_PROPS)
+        for c_tag in c_tags:
+            c_tag_element = persist_find_element(driver, By.XPATH, SellerTagCrawlerPy.XPATH_C_TAG, source_element=c_tag)
+            tag = get_text(driver, c_tag_element)
+            href = persist_get_attribute(driver, c_tag_element, SellerTagCrawlerPy.ATTRIBUTE_HREF)
+            match = re.search(SellerTagCrawlerPy.REGEX_CATEGORY_C, href)
             if match:
-                cp_id = SellerTagCrawlerPy.CATEGORY_P_PREFIX % match.group(1)
-            tag = SellerTagCrawlerPy.CATEGORY_P_PREFIX_TAG % (prop_name, get_text(driver, p_tag))
-            success = success and insert_data(conn, SellerTag(craw_date, page_type, seller_id, tag, cp_id))
+                cp_id = SellerTagCrawlerPy.CATEGORY_C_PREFIX % match.group(1)
+                insert_list.append(SellerTag(craw_date, page_type, seller_id, tag, cp_id))
+
+            if cc_tags := safe_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_CC_PROPS, source_element=c_tag):
+                for cc_tag in cc_tags:
+                    cc_tag_element = persist_find_element(driver, By.XPATH, SellerTagCrawlerPy.XPATH_CC_TAG, source_element=cc_tag)
+                    tag_child = get_text(driver, cc_tag_element)
+                    href = persist_get_attribute(driver, cc_tag_element, SellerTagCrawlerPy.ATTRIBUTE_HREF)
+                    match = re.search(SellerTagCrawlerPy.REGEX_CATEGORY_C, href)
+                    if match:
+                        cp_id = SellerTagCrawlerPy.CATEGORY_C_PREFIX % match.group(1)
+                        combined_tag = SellerTagCrawlerPy.CATEGORY_CC_PREFIX_TAG % (tag, tag_child)
+                        insert_list.append(SellerTag(craw_date, page_type, seller_id, combined_tag, cp_id))
+        return insert_list
+
+    # 嵌套方法 2：提取 P 属性和子标签
+    def extract_p_tags():
+        insert_list = []
+        props = persist_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_P_PROPS)
+        for prop in props:
+            prop_element = persist_find_element(driver, By.XPATH, SellerTagCrawlerPy.XPATH_P_PROP_KEY, source_element=prop)
+            prop_name = get_text(driver, prop_element)
+            p_tags = persist_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_P_TAGS, source_element=prop)
+            for p_tag in p_tags:
+                href = persist_get_attribute(driver, p_tag, SellerTagCrawlerPy.ATTRIBUTE_HREF)
+                match = re.search(SellerTagCrawlerPy.REGEX_CATEGORY_P, href)
+                if match:
+                    cp_id = SellerTagCrawlerPy.CATEGORY_P_PREFIX % match.group(1)
+                    tag = SellerTagCrawlerPy.CATEGORY_P_PREFIX_TAG % (prop_name, get_text(driver, p_tag))
+                    insert_list.append(SellerTag(craw_date, page_type, seller_id, tag, cp_id))
+        return insert_list
+
+    # 调用嵌套方法并插入数据
+    c_tag_list = extract_c_and_cc_tags()
+    success = success and insert_data_batch(conn, c_tag_list)
+
+    p_tag_list = extract_p_tags()
+    success = success and insert_data_batch(conn, p_tag_list)
+
     return success
