@@ -14,6 +14,7 @@ class LogMessageCons:
     DB_REMOVE_URL_FAIL = "❌删除 URL 失败：%s.Task - id = %d"
     DB_SERVER_INSERT_SUCCESS = "✔️成功插入 Seller 表记录：Server.%s"
     DB_SERVER_INSERT_FAIL = "❌插入 Seller 表记录失败：Server.%s"
+    DB_WHITELISTPTAG_FAIL = "❌获取白名单失败"
 
     CD_INIT_FAIL = "❌Chrome 驱动初始化失败"
     CD_INIT_START = "⚠️正在初始化 Chrome 驱动..."
@@ -69,6 +70,7 @@ class DatabaseServicePy:
     SQL_DATA_INSERT = "INSERT INTO Server.%s (%s) VALUES (%s)"
     SQL_COLUMNS_JOIN = ", ".join  # 用于列名拼接
     SQL_PLACEHOLDER_JOIN = lambda count: ", ".join(["%s"] * count)
+    SQL_SELLERTAGWHITELIST_SELECT = "SELECT tag, cp_id, seller_id FROM SellerTagWhitelist"
 
     STATE_STATE = "state"
     STATE_LOCK = "lock"
@@ -149,10 +151,14 @@ class SellerTagCrawlerPy:
     REGEX_CATEGORY_C = r'category-(\d+)'
     CATEGORY_C_PREFIX = "c_:_%s"
     CATEGORY_CC_PREFIX_TAG = "%s_:_%s"
-    REGEX_CATEGORY_P = r"pv=([^&]+)"
+    REGEX_CATEGORY_P = r'pv=.*?((\d+:\d+)(?:-\d+:\d+)*)(?:&|#|$)'
     CATEGORY_P_PREFIX = "p_:_%s"
     CATEGORY_P_PREFIX_TAG = "%s_:_%s"
     ATTRIBUTE_HREF = "href"
+    P_MATCH_SPLIT = '-'
+    CP_ID = "cp_id"
+    TAG = "tag"
+    SELLER_ID = "seller_id"
 
 class ProductTagCrawlerPy:
     BLANK_DATA = "?"

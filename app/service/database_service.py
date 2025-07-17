@@ -154,3 +154,14 @@ def insert_data_batch(conn, data_list):
         return False
     finally:
         cursor.close()
+
+def load_whitelist_p_data(conn):
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute(DatabaseServicePy.SQL_SELLERTAGWHITELIST_SELECT)
+        return cursor.fetchall()
+    except Exception as e:
+        log(LogMessageCons.DB_WHITELISTPTAG_FAIL, LogSourceCons.DATABASE_SERVICE, LOG_PRINT, e)
+        return []
+    finally:
+        cursor.close()

@@ -9,7 +9,7 @@ from app.common.enums import TaskSellerPageType
 from app.model.seller_tag import SellerTag
 from app.service.abnormal_processing_service import wait_load, persist_find_elements, persist_find_element, persist_get_attribute, safe_continue, safe_find_elements
 from app.service.chrome_driver_service import get_url, get_text
-from app.service.database_service import insert_data, insert_data_batch
+from app.service.database_service import insert_data, insert_data_batch, load_whitelist_p_data
 from app.service.identifiers.task_seller_identifier import get_type, get_seller_id
 
 def craw(conn, driver, taskUrl):
@@ -31,7 +31,6 @@ def craw_tm(conn, driver):
 
     insert_data(conn, SellerTag(craw_date, page_type, seller_id, SellerTagCrawlerPy.ALL_PRODUCT, SellerTagCrawlerPy.CATEGORY_ALL_PREFIX))
 
-    # 嵌套方法 1：提取 C 标签和 CC 标签
     def extract_c_and_cc_tags():
         insert_list = []
         c_tags = persist_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_C_PROPS)
@@ -56,7 +55,9 @@ def craw_tm(conn, driver):
                         insert_list.append(SellerTag(craw_date, page_type, seller_id, combined_tag, cp_id))
         return insert_list
 
-    # 嵌套方法 2：提取 P 属性和子标签
+    c_tag_list = extract_c_and_cc_tags()
+    success = success and insert_data_batch(conn, c_tag_list)
+
     def extract_p_tags():
         insert_list = []
         props = persist_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_P_PROPS)
@@ -73,11 +74,20 @@ def craw_tm(conn, driver):
                     insert_list.append(SellerTag(craw_date, page_type, seller_id, tag, cp_id))
         return insert_list
 
-    # 调用嵌套方法并插入数据
-    c_tag_list = extract_c_and_cc_tags()
-    success = success and insert_data_batch(conn, c_tag_list)
-
     p_tag_list = extract_p_tags()
+    success = success and insert_data_batch(conn, p_tag_list)
+
+    def white_list_p_tags(whitelist_data):
+        insert_list = []
+        for row in whitelist_data:
+            if str(row[SellerTagCrawlerPy.SELLER_ID]) != str(seller_id):
+                continue
+            full_cp_id = SellerTagCrawlerPy.CATEGORY_P_PREFIX % row[SellerTagCrawlerPy.CP_ID]
+            insert_list.append(SellerTag(craw_date, page_type, seller_id, row[SellerTagCrawlerPy.TAG], full_cp_id))
+        return insert_list
+
+    p_tag_white_list = white_list_p_tags(load_whitelist_p_data(conn))
+
     success = success and insert_data_batch(conn, p_tag_list)
 
     return success
