@@ -1,4 +1,5 @@
 import re
+import time
 from datetime import datetime
 
 from selenium.webdriver.common.by import By
@@ -33,9 +34,13 @@ def craw_tm(conn, driver):
     title_element = persist_find_element(driver, By.XPATH, ProductCrawlerPy.XPATH_TITLE)
     title = safe_get_attribute(driver, title_element, ProductCrawlerPy.ATTRIBUTE_TITLE)
     sold365_element = persist_find_element(driver, By.XPATH, ProductCrawlerPy.XPATH_SOLD365)
-    sold365 = get_text(driver, sold365_element).replace(ProductCrawlerPy.DOT, ProductCrawlerPy.BLANK)
+    sold365 = get_text(driver, sold365_element)
+    if sold365:
+        sold365.replace(ProductCrawlerPy.DOT, ProductCrawlerPy.BLANK)
     address_element = persist_find_element(driver, By.XPATH, ProductCrawlerPy.XPATH_ADDRESS)
-    address = get_text(driver, address_element).replace(ProductCrawlerPy.TO, ProductCrawlerPy.BLANK)
+    address = get_text(driver, address_element)
+    if address:
+        address.replace(ProductCrawlerPy.TO, ProductCrawlerPy.BLANK)
 
     guarantee_elements = persist_find_elements(driver, By.XPATH, ProductCrawlerPy.XPATH_GUARANTEES)
     guarantees = []
@@ -90,6 +95,7 @@ def craw_tm(conn, driver):
 
     while has_next:
         valid = True
+        time.sleep(5)
         for i, group in enumerate(sku_item_lists):
             if is_disabled(group[current_pattern[i]]):
                 valid = False

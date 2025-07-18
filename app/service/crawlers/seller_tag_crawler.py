@@ -86,7 +86,7 @@ def craw_tm(conn, driver):
             insert_list.append(SellerTag(craw_date, page_type, seller_id, row[SellerTagCrawlerPy.TAG], full_cp_id))
         return insert_list
 
-    p_tag_white_list = white_list_p_tags(load_whitelist_p_data(conn))
+    # p_tag_white_list = white_list_p_tags(load_whitelist_p_data(conn))
 
     success = success and insert_data_batch(conn, p_tag_list)
 

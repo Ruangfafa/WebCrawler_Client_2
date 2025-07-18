@@ -1,3 +1,5 @@
+import re
+
 import mysql.connector
 
 from mysql.connector import Error, MySQLConnection
@@ -97,13 +99,13 @@ def to_camel_case(snake_str):
 
 def insert_data(conn, data):
     cursor = conn.cursor()
-    table = data.__class__.__name__
+    table = re.sub(r'(?<!^)(?=[A-Z])', '_', data.__class__.__name__).lower()
 
     if not isinstance(data, dict):
         data = data.__dict__
 
     # 转换字段名为 camelCase
-    transformed_data = {to_camel_case(k): v for k, v in data.items()}
+    transformed_data = {k: v for k, v in data.items()}
 
     columns = DatabaseServicePy.SQL_COLUMNS_JOIN(transformed_data.keys())
     placeholders = DatabaseServicePy.SQL_PLACEHOLDER_JOIN(len(transformed_data))

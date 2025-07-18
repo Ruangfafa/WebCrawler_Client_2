@@ -63,10 +63,10 @@ class LogPy:
     LOG_FORMAT_WITH_ERROR = "[{timestamp}] [{source}] {message} | ERROR: {error}"
 
 class DatabaseServicePy:
-    SQL_CLIENTSTATUS_SELECT = "SELECT value FROM %s.State WHERE `key` = %%s LIMIT 1"
-    SQL_TASK_SELECT_FIRST = "SELECT id, url FROM %s.Task ORDER BY id ASC LIMIT 1"
-    SQL_TASK_DELETE_BY_ID = "DELETE FROM %s.Task WHERE id = %%s"
-    SQL_CLIENTSTATUS_UPDATE = "UPDATE %s.State SET value = %%s WHERE `key` = %%s"
+    SQL_CLIENTSTATUS_SELECT = "SELECT value FROM %s.state WHERE `key` = %%s LIMIT 1"
+    SQL_TASK_SELECT_FIRST = "SELECT id, url FROM %s.task ORDER BY id ASC LIMIT 1"
+    SQL_TASK_DELETE_BY_ID = "DELETE FROM %s.task WHERE id = %%s"
+    SQL_CLIENTSTATUS_UPDATE = "UPDATE %s.state SET value = %%s WHERE `key` = %%s"
     SQL_DATA_INSERT = "INSERT INTO Server.%s (%s) VALUES (%s)"
     SQL_COLUMNS_JOIN = ", ".join  # 用于列名拼接
     SQL_PLACEHOLDER_JOIN = lambda count: ", ".join(["%s"] * count)
@@ -92,7 +92,7 @@ class ChromeDriverServicePy:
 
     # 浏览器参数配置
     WINDOW_SIZE = "--window-size=1920,1080"
-    USER_AGENT = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+    USER_AGENT = "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     EXCLUDE_SWITCHES = ["enable-automation"]
     DISABLE_FEATURES = "--disable-blink-features=AutomationControlled"
     NO_SANDBOX = "--no-sandbox"

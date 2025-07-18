@@ -1,8 +1,6 @@
-from selenium import webdriver
 from selenium.common import JavascriptException
 from selenium.webdriver import ActionChains
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
+import undetected_chromedriver as uc
 
 
 from app.common.config_loader import HEADLESS, LOG_PRINT, USER_FILE
@@ -10,23 +8,24 @@ from app.common.constants import ChromeDriverServicePy, LogMessageCons, LogSourc
 from app.service.log import log
 
 
-def init_driver() -> webdriver.Chrome:
+def init_driver() -> uc.Chrome:
     try:
         log(LogMessageCons.CD_INIT_START, LogSourceCons.CHROME_DRIVER_SERVICE, doPrint=LOG_PRINT)
-        # 参数配置
-        options = Options()
+
+        options = uc.ChromeOptions()
         options.add_argument(ChromeDriverServicePy.WINDOW_SIZE)
         options.add_argument(ChromeDriverServicePy.get_user_data_arg(USER_FILE))
         options.add_argument(ChromeDriverServicePy.USER_AGENT)
-        options.add_experimental_option(ChromeDriverServicePy.EXPERIMENTAL_OPTION_EXCLUDE_SWITCHES, ChromeDriverServicePy.EXCLUDE_SWITCHES)
-        options.add_argument(ChromeDriverServicePy.DISABLE_FEATURES)
+        options.add_argument(f"--disable-blink-features={ChromeDriverServicePy.DISABLE_FEATURES}")
         options.add_argument(ChromeDriverServicePy.NO_SANDBOX)
         options.add_argument(ChromeDriverServicePy.DISABLE_DEV_SHM)
-        options.add_experimental_option(ChromeDriverServicePy.EXPERIMENTAL_OPTION_DETACH, ChromeDriverServicePy.DETACH)
-        if HEADLESS: options.add_argument(ChromeDriverServicePy.HEADLESS_ARG)  # 启用无头模式（可选）
+        if HEADLESS:
+            options.add_argument(ChromeDriverServicePy.HEADLESS_ARG)
+
         log(LogMessageCons.CD_USERDATA_PATH % ChromeDriverServicePy.get_user_data_arg(USER_FILE), LogSourceCons.CHROME_DRIVER_SERVICE, doPrint=LOG_PRINT)
-        service = Service(ChromeDriverServicePy.DRIVER_PATH)
-        driver = webdriver.Chrome(service=service, options=options)
+
+        # 用 uc.Chrome() 替代原本 webdriver.Chrome(service=..., options=...)
+        driver = uc.Chrome(options=options, use_subprocess=True)  # 可指定 Chrome 主版本号（自动适配驱动）
         log(LogMessageCons.CD_INIT_SUCCESS, LogSourceCons.CHROME_DRIVER_SERVICE, LOG_PRINT)
         return driver
     except Exception as e:
@@ -95,7 +94,11 @@ def move_by_offset(driver, offset_x, offset_y, click=False):
     actions.perform()
 
 def get_text(driver, source_element):
-    return driver.execute_script(ChromeDriverServicePy.JS_GET_TEXT, source_element).strip()
+    try:
+        text = driver.execute_script(ChromeDriverServicePy.JS_GET_TEXT, source_element).strip()
+    except JavascriptException:
+        text = None
+    return text
 
 def scroll_bottom(driver, source_element):
     try:
