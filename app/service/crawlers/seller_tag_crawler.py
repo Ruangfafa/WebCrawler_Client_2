@@ -22,14 +22,14 @@ def craw(conn, driver, taskUrl):
     return False
 
 def craw_tm(conn, driver):
-    craw_date = page_type = seller_id = tag = cp_id = SellerTagCrawlerPy.BLANK_DATA
+    craw_date = page_type = seller_id = tag = c_id = p_id = SellerTagCrawlerPy.BLANK_DATA
     success = True
 
     craw_date = datetime.now(TIME_ZONE)
     page_type = TaskSellerPageType.TM.value
     seller_id = get_seller_id(get_url(driver), TaskSellerPageType.TM)
 
-    insert_data(conn, SellerTag(craw_date, page_type, seller_id, SellerTagCrawlerPy.ALL_PRODUCT, SellerTagCrawlerPy.CATEGORY_ALL_PREFIX))
+    insert_data(conn, SellerTag(craw_date, page_type, seller_id, SellerTagCrawlerPy.ALL_PRODUCT, SellerTagCrawlerPy.CATEGORY_ALL_PREFIX, SellerTagCrawlerPy.CATEGORY_ALL_PREFIX))
 
     def extract_c_and_cc_tags():
         insert_list = []
@@ -40,8 +40,8 @@ def craw_tm(conn, driver):
             href = persist_get_attribute(driver, c_tag_element, SellerTagCrawlerPy.ATTRIBUTE_HREF)
             match = re.search(SellerTagCrawlerPy.REGEX_CATEGORY_C, href)
             if match:
-                cp_id = SellerTagCrawlerPy.CATEGORY_C_PREFIX % match.group(1)
-                insert_list.append(SellerTag(craw_date, page_type, seller_id, tag, cp_id))
+                c_id = match.group(1)
+                insert_list.append(SellerTag(craw_date, page_type, seller_id, tag, c_id, None))
 
             if cc_tags := safe_find_elements(driver, By.XPATH, SellerTagCrawlerPy.XPATH_CC_PROPS, source_element=c_tag):
                 for cc_tag in cc_tags:
@@ -50,9 +50,9 @@ def craw_tm(conn, driver):
                     href = persist_get_attribute(driver, cc_tag_element, SellerTagCrawlerPy.ATTRIBUTE_HREF)
                     match = re.search(SellerTagCrawlerPy.REGEX_CATEGORY_C, href)
                     if match:
-                        cp_id = SellerTagCrawlerPy.CATEGORY_C_PREFIX % match.group(1)
+                        c_id = match.group(1)
                         combined_tag = SellerTagCrawlerPy.CATEGORY_CC_PREFIX_TAG % (tag, tag_child)
-                        insert_list.append(SellerTag(craw_date, page_type, seller_id, combined_tag, cp_id))
+                        insert_list.append(SellerTag(craw_date, page_type, seller_id, combined_tag, c_id, None))
         return insert_list
 
     c_tag_list = extract_c_and_cc_tags()
@@ -69,9 +69,9 @@ def craw_tm(conn, driver):
                 href = persist_get_attribute(driver, p_tag, SellerTagCrawlerPy.ATTRIBUTE_HREF)
                 match = re.search(SellerTagCrawlerPy.REGEX_CATEGORY_P, href)
                 if match:
-                    cp_id = SellerTagCrawlerPy.CATEGORY_P_PREFIX % match.group(1)
+                    p_id = match.group(1)
                     tag = SellerTagCrawlerPy.CATEGORY_P_PREFIX_TAG % (prop_name, get_text(driver, p_tag))
-                    insert_list.append(SellerTag(craw_date, page_type, seller_id, tag, cp_id))
+                    insert_list.append(SellerTag(craw_date, page_type, seller_id, tag, None, p_id))
         return insert_list
 
     p_tag_list = extract_p_tags()
@@ -82,8 +82,8 @@ def craw_tm(conn, driver):
         for row in whitelist_data:
             if str(row[SellerTagCrawlerPy.SELLER_ID]) != str(seller_id):
                 continue
-            full_cp_id = SellerTagCrawlerPy.CATEGORY_P_PREFIX % row[SellerTagCrawlerPy.CP_ID]
-            insert_list.append(SellerTag(craw_date, page_type, seller_id, row[SellerTagCrawlerPy.TAG], full_cp_id))
+            p_id = row[SellerTagCrawlerPy.P_ID]
+            insert_list.append(SellerTag(craw_date, page_type, seller_id, row[SellerTagCrawlerPy.TAG], None, p_id))
         return insert_list
 
     # p_tag_white_list = white_list_p_tags(load_whitelist_p_data(conn))

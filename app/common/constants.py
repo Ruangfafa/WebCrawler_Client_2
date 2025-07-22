@@ -116,9 +116,7 @@ class TaskTagIdentifierPy:
     URL_TMALL = ".tmall.com"
     SELLER_ID = r'https?://(?:[^/]+\.)?([^.]+)\.tmall\.com'
     DOT = "."
-    CATEGORY_C_PREFIX = "c_:_%s"
-    CATEGORY_P_PREFIX = "p_:_%s"
-    CATEGORY_ALL_PREFIX = "a_:_xxxxx"
+    CATEGORY_ALL_PREFIX = "all"
     REGEX_CATEGORY_C = r'category-(\d+)'
     REGEX_CATEGORY_P = r'[?&]pv=([^&#]+)'
 
@@ -147,16 +145,14 @@ class SellerTagCrawlerPy:
     BLANK_DATA = "?"
     NO_DATA = "N/A"
     ALL_PRODUCT = "所有分类"
-    CATEGORY_ALL_PREFIX = "a_:_xxxxx"
+    CATEGORY_ALL_PREFIX = "all"
     REGEX_CATEGORY_C = r'category-(\d+)'
-    CATEGORY_C_PREFIX = "c_:_%s"
     CATEGORY_CC_PREFIX_TAG = "%s_:_%s"
     REGEX_CATEGORY_P = r'pv=.*?((\d+:\d+)(?:-\d+:\d+)*)(?:&|#|$)'
-    CATEGORY_P_PREFIX = "p_:_%s"
     CATEGORY_P_PREFIX_TAG = "%s_:_%s"
     ATTRIBUTE_HREF = "href"
     P_MATCH_SPLIT = '-'
-    CP_ID = "cp_id"
+    P_ID = "p_id"
     TAG = "tag"
     SELLER_ID = "seller_id"
 

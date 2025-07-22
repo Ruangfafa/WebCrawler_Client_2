@@ -10,7 +10,7 @@ from app.service.abnormal_processing_service import wait_load, safe_continue, pe
     safe_find_elements, safe_find_element, persist_find_element
 from app.service.chrome_driver_service import get_url, get_text
 from app.service.database_service import insert_data
-from app.service.identifiers.task_tag_identifier import get_type, get_seller_id, get_cp_id
+from app.service.identifiers.task_tag_identifier import get_type, get_seller_id, get_c_id, get_p_id
 
 
 def craw(conn, driver, taskUrl):
@@ -23,12 +23,13 @@ def craw(conn, driver, taskUrl):
     return False
 
 def craw_tm(conn, driver):
-    craw_date = page_type = cp_id = seller_id = product_id = sold = ProductTagCrawlerPy.BLANK_DATA
+    craw_date = page_type = c_id = p_id = seller_id = product_id = sold = ProductTagCrawlerPy.BLANK_DATA
     success = more_page = True
 
     craw_date = datetime.now(TIME_ZONE)
     page_type = TaskTagPageType.TM.value
-    cp_id = get_cp_id(get_url(driver), TaskTagPageType.TM)
+    c_id = get_c_id(get_url(driver), TaskTagPageType.TM)
+    p_id = get_p_id(get_url(driver), TaskTagPageType.TM)
     seller_id = get_seller_id(get_url(driver), TaskTagPageType.TM)
 
     while more_page:
@@ -43,7 +44,7 @@ def craw_tm(conn, driver):
                 product_id = safe_get_attribute(driver, product_div, ProductTagCrawlerPy.ATTRIBUTE_DATA_ID)
                 sold_element = safe_find_element(driver, By.XPATH, ProductTagCrawlerPy.XPATH_SOLD, source_element=product_div)
                 sold = get_text(driver, sold_element)
-                success = success and insert_data(conn, ProductTag(craw_date, page_type, cp_id, seller_id, product_id, sold))
+                success = success and insert_data(conn, ProductTag(craw_date, page_type, c_id, p_id, seller_id, product_id, sold))
         page_info_element = persist_find_element(driver, By.XPATH, ProductTagCrawlerPy.XPATH_PAGE_INFO)
         page_info = get_text(driver, page_info_element)
         if is_last_page(page_info): break

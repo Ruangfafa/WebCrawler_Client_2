@@ -88,15 +88,6 @@ def remove_url(conn, database, task_id):
         log(LogMessageCons.DB_REMOVE_URL_FAIL % (database, task_id), LogSourceCons.DATABASE_SERVICE, LOG_PRINT, e)
         return False
 
-def to_camel_case(snake_str):
-    """
-    将变量名从 snake_case 转换为 camelCase
-    例：craw_date → crawDate
-    """
-    components = snake_str.split(DatabaseServicePy.FORMAT_UNDERLINE)
-    return components[0] + DatabaseServicePy.FORMAT_BLANK.join(x.capitalize() for x in components[1:]) if len(components) > 1 else snake_str
-
-
 def insert_data(conn, data):
     cursor = conn.cursor()
     table = re.sub(r'(?<!^)(?=[A-Z])', '_', data.__class__.__name__).lower()
@@ -133,7 +124,7 @@ def insert_data_batch(conn, data_list):
     table = data_list[0].__class__.__name__
 
     sample = data_list[0].__dict__
-    keys = [to_camel_case(k) for k in sample.keys()]
+    keys = [k for k in sample.keys()]
     columns = DatabaseServicePy.SQL_COLUMNS_JOIN(keys)
     placeholders = DatabaseServicePy.SQL_PLACEHOLDER_JOIN(len(keys))
 
@@ -142,7 +133,7 @@ def insert_data_batch(conn, data_list):
     values_list = []
     for obj in data_list:
         data = obj.__dict__
-        transformed_data = {to_camel_case(k): v for k, v in data.items()}
+        transformed_data = {k: v for k, v in data.items()}
         values_list.append(list(transformed_data.values()))
 
     try:

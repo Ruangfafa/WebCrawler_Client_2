@@ -48,7 +48,7 @@ def craw_tm(conn, driver):
         start_time = time.time()
         if past_size == (new_size := (len(comment_elements := persist_find_elements(driver, By.XPATH, CommentCrawlerPy.XPATH_COMMENT)))):
             for _ in range(4):
-                time.sleep(1)
+                time.sleep(2)
                 while safe_find_element(driver, By.XPATH, CommentCrawlerPy.XPATH_LOADING, log_print=False):
                     log(LogMessageCons.COMCRW_COMMENT_WAIT, LogSourceCons.COMMENT_CRAWLER, LOG_PRINT)
                 if past_size != (new_size := (len(comment_elements := persist_find_elements(driver, By.XPATH, CommentCrawlerPy.XPATH_COMMENT)))): break
