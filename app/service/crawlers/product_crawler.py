@@ -8,6 +8,7 @@ from app.common.config_loader import TIME_ZONE
 from app.common.constants import ProductCrawlerPy
 from app.common.enums import TaskProductPageType
 from app.model.product import Product
+from app.model.product_sku import ProductSku
 from app.service.abnormal_processing_service import wait_load, safe_continue, persist_find_element, safe_get_attribute, \
     persist_find_elements, safe_find_element
 from app.service.chrome_driver_service import get_text, move_to_element, get_url
@@ -84,13 +85,16 @@ def craw_tm(conn, driver):
         else:
             disc_price = ProductCrawlerPy.NO_DISCOUNT
             orgn_price = get_text(driver, highlight_price_element)
-        return success and insert_data(conn, Product(craw_date, page_type, product_id, title, sold365, address, guarantee, parameter, pattern_com, sku_id, pattern, orgn_price, disc_price))
+        success_product = insert_data(conn, Product(craw_date, page_type, product_id, title, sold365, address, guarantee, parameter, pattern_com))
+        success_product_sku = insert_data(conn, ProductSku(craw_date, page_type, product_id, sku_id, pattern, orgn_price, disc_price))
+        return success and success_product and success_product_sku
 
     current_pattern = [0] * len(sku_item_elements)
 
     def is_disabled(element): return ProductCrawlerPy.IS_DISABLED in element.get_attribute(ProductCrawlerPy.ATTRIBUTE_CLASS)
     def is_selected(element): return ProductCrawlerPy.IS_SELECTED in element.get_attribute(ProductCrawlerPy.ATTRIBUTE_CLASS)
 
+    success_product = insert_data(conn, Product(craw_date, page_type, product_id, title, sold365, address, guarantee, parameter, pattern_com))
     has_next = True
 
     while has_next:
@@ -126,7 +130,7 @@ def craw_tm(conn, driver):
         match = re.search(ProductCrawlerPy.SKU_ID, current_url)
         if match:
             sku_id = match.group(1)
-        success = success and insert_data(conn, Product(craw_date, page_type, product_id, title, sold365, address, guarantee, parameter, pattern_com, sku_id, pattern, orgn_price, disc_price))
+        success = success and success_product and insert_data(conn, ProductSku(craw_date, page_type, product_id, sku_id, pattern, orgn_price, disc_price))
 
         for i in reversed(range(len(current_pattern))):
             current_pattern[i] += 1

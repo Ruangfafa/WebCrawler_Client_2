@@ -1,5 +1,5 @@
 class Product:
-    def __init__(self, craw_date, page_type, product_id, title, sold365, address, guarantee, parameter, pattern_com, sku_id, pattern, orgn_price, disc_price):
+    def __init__(self, craw_date, page_type, product_id, title, sold365, address, guarantee, parameter, pattern_com):
         self.craw_date = craw_date
         self.page_type = page_type
         self.product_id = product_id
@@ -9,7 +9,3 @@ class Product:
         self.guarantee = guarantee
         self.parameter = parameter
         self.pattern_com = pattern_com
-        self.sku_id = sku_id
-        self.pattern = pattern
-        self.orgn_price = orgn_price
-        self.disc_price = disc_price
